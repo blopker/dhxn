@@ -1,0 +1,144 @@
+html {
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    box-sizing: border-box;
+  }
+  
+  details {
+    display: block;
+  }
+  
+  *,
+  *:before,
+  *:after {
+    box-sizing: inherit;
+  }
+  
+  body {
+    margin: 0;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
+      Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: 300;
+    word-wrap: break-word;
+    background-color: #000;
+    color: #ececec;
+  }
+  
+  body > a {
+    text-decoration: none;
+  }
+  
+  a {
+    color: #ececec;
+  }
+  
+  p:last-of-type {
+    margin-bottom: 0;
+  }
+  
+  #container,
+  .header-title {
+    margin: 0 auto;
+    max-width: 800px;
+  }
+  
+  header {
+    display: block;
+    padding: 10px;
+    width: 100%;
+    border-bottom: 1px solid #3b3b3b;
+  }
+  
+  h3 {
+    margin: 0;
+  }
+  
+  pre {
+    overflow: auto;
+  }
+  
+  .list-item {
+    position: relative;
+  }
+  
+  .list-item a {
+    text-decoration: none;
+    color: #ececec;
+    outline: none;
+  }
+  
+  .list-item a:visited {
+    text-decoration: none;
+    color: #969696;
+  }
+  
+  .list-item .title {
+    margin-right: 50px;
+  }
+  
+  .list-item .story {
+    padding: 10px;
+    margin-right: 70px;
+    min-height: 60px;
+  }
+  
+  .list-item .host {
+    color: #767676;
+  }
+  
+  .comment-header {
+    padding: 10px;
+    border-bottom: 1px solid gray;
+  }
+  
+  .comment-header-author {
+    color: gray;
+  }
+  
+  .comments {
+    padding-right: 10px;
+  }
+  
+  .comment {
+    padding-left: 10px;
+    border-left: 1px solid gray;
+  }
+  
+  .comments > .comment {
+    border-left: none;
+  }
+  
+  .comment .text {
+    padding-top: 10px;
+  }
+  
+  .children {
+    margin-top: 10px;
+  }
+  
+  .items > .comment {
+    border-left: none;
+  }
+  
+  .author {
+    color: gray;
+    border-bottom: 1px dashed gray;
+    padding: 10px 0;
+    cursor: pointer;
+  }
+  
+  aside {
+    height: 100%;
+    padding: 10px;
+    text-align: center;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 70px;
+  }
+  
+  footer {
+    text-align: center;
+    padding: 10px;
+  }
+  

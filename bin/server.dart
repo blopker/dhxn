@@ -3,30 +3,56 @@ import 'dart:io';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:shelf_static/shelf_static.dart';
+import 'package:shelf_hotreload/shelf_hotreload.dart';
+import 'package:shelf_gzip/shelf_gzip.dart';
+
+import 'api.dart';
+import 'pages.dart';
+import 'config.dart';
 
 // Configure routes.
 final _router = Router()
-  ..get('/', _rootHandler)
-  ..get('/echo/<message>', _echoHandler);
+  ..get('/', _indexHandler)
+  ..get('/comments/<id>', _commentHandler)
+  ..get(
+      '${Env.staticBase}/main.css',
+      createFileHandler('assets/main.css',
+          url: '${Env.staticBase}/main.css'.substring(1)))
+  ..get(
+      '${Env.staticBase}/favicon.ico',
+      createFileHandler('assets/favicon.ico',
+          url: '${Env.staticBase}/favicon.ico'.substring(1)));
 
-Response _rootHandler(Request req) {
-  return Response.ok('Hello, World!\n');
+Response htmlResponse(String content) => Response.ok(content, headers: {
+      'content-type': 'text/html; charset=utf-8',
+    });
+
+Response _indexHandler(Request req) {
+  return htmlResponse(indexPage());
 }
 
-Response _echoHandler(Request request) {
-  final message = request.params['message'];
-  return Response.ok('$message\n');
+Future<Response> _commentHandler(Request req) async {
+  var id = int.tryParse(req.params['id'] ?? '');
+  if (id == null) {
+    return Response.notFound('id must be an integer');
+  }
+  return htmlResponse(await commentPage(id));
 }
 
-void main(List<String> args) async {
-  // Use any available host or container IP (usually `0.0.0.0`).
+void main() async {
+  startApi();
+  withHotreload(() => createServer());
+}
+
+Future<HttpServer> createServer() async {
   final ip = InternetAddress.anyIPv4;
-
-  // Configure a pipeline that logs requests.
-  final handler = Pipeline().addMiddleware(logRequests()).addHandler(_router);
-
-  // For running in containers, we respect the PORT environment variable.
+  final handler = Pipeline()
+      .addMiddleware(logRequests())
+      .addMiddleware(gzipMiddleware)
+      .addHandler(_router);
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
   final server = await serve(handler, ip, port);
   print('Server listening on port ${server.port}');
+  return server;
 }

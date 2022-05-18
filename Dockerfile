@@ -1,5 +1,5 @@
 # Use latest stable channel SDK.
-FROM dart:stable AS build
+FROM dart:2.17 AS build
 
 # Resolve app dependencies.
 WORKDIR /app
