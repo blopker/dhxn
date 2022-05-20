@@ -13,7 +13,7 @@ class Env {
   static String env(key, defaultValue) =>
       Platform.environment[key] ?? defaultValue;
   static String get port => env('PORT', 8080);
-  static bool get isDebug => env('DEBUG', 'PRODUCTION') == 'DEBUG';
+  static bool get isDebug => env('DEBUG', 'false') == 'true';
   static bool get isProduction => !isDebug;
   static String get staticBase => _staticBase;
 }

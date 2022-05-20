@@ -42,7 +42,11 @@ Future<Response> _commentHandler(Request req) async {
 
 void main() async {
   startApi();
-  withHotreload(() => createServer());
+  if (Env.isDebug) {
+    withHotreload(() => createServer());
+  } else {
+    await createServer();
+  }
 }
 
 Future<HttpServer> createServer() async {
