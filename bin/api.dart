@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 
 import 'package:eventsource/eventsource.dart';
-import 'package:http/http.dart' as http;
 import 'package:quiver/collection.dart';
+import 'package:dio/dio.dart' as dio;
 
 var _cache = LruMap<int, Item>(maximumSize: 10000);
-var _client = http.Client();
+var _client = dio.Dio();
 var _topStories = <int>[];
 
 class Item {
@@ -117,8 +118,8 @@ Future<Item?> _getItem(int id, {cache = true}) async {
     return _cache[id];
   }
   var url = Uri.parse('https://hacker-news.firebaseio.com/v0/item/$id.json');
-  var response = await _client.get(url);
-  var json = jsonDecode(response.body);
+  var response = await _client.getUri(url);
+  var json = response.data;
   if (json == null || json['type'] == null) {
     return null;
   }
@@ -161,7 +162,15 @@ startApi() async {
       }
     }
     // print(event.data);
-  });
+  })
+    ..onError((e) {
+      print(e);
+      exit(1);
+    })
+    ..onDone(() {
+      print('startAPI ended');
+      exit(1);
+    });
 }
 
 void _refresh(Item item) async {
