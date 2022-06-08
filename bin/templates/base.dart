@@ -28,7 +28,7 @@ String baseTemplate(String title, String content) {
             $content
         </div>
         <footer>
-            Yolo'd by blopker. <a href="https://github.com/blopker/gohxn">Source</a>.
+            Yolo'd by blopker. <a href="https://github.com/blopker/dhxn">Source</a>.
         </footer>
     </body>
 </html>
