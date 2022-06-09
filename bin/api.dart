@@ -175,7 +175,7 @@ startApi() async {
 
 void _refresh(Item item) async {
   for (var commentId in item.kids) {
-    var comment = (await _getItem(commentId)) as Comment?;
+    var comment = (await _getItem(commentId, cache: false)) as Comment?;
     if (comment == null) {
       return;
     }
