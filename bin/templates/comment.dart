@@ -1,29 +1,31 @@
 import 'base.dart';
 import '../api.dart';
 
-String commentTemplate(Story story) {
+Future<String> commentTemplate(Story story) async {
   var commentsHTML = StringBuffer();
-  for (var comment in story.getKids()) {
-    commentsHTML.write(_commentHTML(comment));
+  for (var comment in await story.getKids()) {
+    commentsHTML.write(await _commentHTML(comment));
   }
 
   return baseTemplate('Comments', _storyHTML(story, commentsHTML.toString()));
 }
 
-String _commentHTML(Comment comment) {
+Future<String> _commentHTML(Comment comment) async {
   if (comment.by.isEmpty || comment.text.isEmpty) {
     return '';
   }
   return '''        
   <details open class="comment">
-      <summary class="author">${comment.by}</summary>
+      <summary class="author">${comment.by} - ${comment.timeago}</summary>
       <div class="text">${comment.text}</div>
-      ${_childrenHTML(comment.getKids())}
+      ${await _childrenHTML(await comment.getKids())}
   </details>''';
 }
 
-String _childrenHTML(List<Comment> comments) {
-  var content = comments.map((comment) => _commentHTML(comment)).join('\n');
+Future<String> _childrenHTML(List<Comment> comments) async {
+  var content =
+      (await Future.wait(comments.map((comment) => _commentHTML(comment))))
+          .join('\n');
   if (content.isEmpty) {
     return '';
   }

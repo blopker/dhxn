@@ -1,5 +1,3 @@
-import 'package:http/http.dart';
-
 import 'templates/index.dart';
 import 'templates/comment.dart';
 import 'api.dart';
@@ -14,5 +12,5 @@ Future<String> commentPage(int id) async {
   if (story == null) {
     return '404';
   }
-  return commentTemplate(story);
+  return await commentTemplate(story);
 }

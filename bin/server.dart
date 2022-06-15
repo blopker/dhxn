@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:shelf/shelf.dart';
@@ -41,7 +42,10 @@ Future<Response> _commentHandler(Request req) async {
 }
 
 void main() async {
-  startApi();
+  updateTopStories();
+  Timer.periodic(Duration(minutes: 1), (t) {
+    updateTopStories();
+  });
   if (Env.isDebug) {
     withHotreload(() => createServer());
   } else {
@@ -57,6 +61,6 @@ Future<HttpServer> createServer() async {
       .addHandler(_router);
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
   final server = await serve(handler, ip, port);
-  print('Server listening on port ${server.port}');
+  print('Server at http://localhost:${server.port}');
   return server;
 }

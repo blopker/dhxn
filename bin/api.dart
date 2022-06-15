@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'dart:core';
-import 'dart:io';
-
-import 'package:eventsource/eventsource.dart';
+import 'package:timeago/timeago.dart' as ta;
 import 'package:quiver/collection.dart';
 import 'package:dio/dio.dart' as dio;
 
@@ -26,8 +23,11 @@ class Item {
     required this.kids,
   });
 
-  List<Comment> getKids() {
-    var results = kids.map((kid) => _cache[kid]);
+  get timeago => ta.format(DateTime.fromMillisecondsSinceEpoch(time * 1000));
+
+  Future<List<Comment>> getKids() async {
+    var resultsF = kids.map((kid) => _getItem(kid));
+    var results = await Future.wait(resultsF);
     return results.whereType<Comment>().toList();
   }
 }
@@ -135,42 +135,33 @@ Future<Item?> _getItem(int id, {cache = true}) async {
   return item;
 }
 
-startApi() async {
-  EventSource eventSource = await EventSource.connect(
-      "https://hacker-news.firebaseio.com/v0/topstories.json");
-  eventSource.listen((event) async {
-    if (event.data != null) {
-      var json = jsonDecode(event.data!);
-      // print(json);
-      if (json == null || json['data'] == null) {
-        return;
-      }
-      var stories = json["data"] as List;
-      _topStories = stories.sublist(0, 30).cast<int>();
-      var cachedResults = _topStories.map((id) => _cache[id]).toList();
-      var results = await Future.wait(
-          _topStories.map((id) => _getItem(id, cache: false)));
-      for (var i = 0; i < _topStories.length; i++) {
-        var story = results[i] as Story?;
-        var cached = cachedResults[i] as Story?;
-        if (story == null) {
-          continue;
-        }
-        if (cached == null || cached.descendants != story.descendants) {
-          _refresh(story);
-        }
-      }
+updateTopStories() async {
+  var url = Uri.parse('https://hacker-news.firebaseio.com/v0/topstories.json');
+  List<int>? stories;
+  try {
+    var response = await _client.getUri(url);
+    stories = response.data.cast<int>();
+  } catch (e) {
+    print(e);
+    return;
+  }
+  if (stories == null) {
+    return;
+  }
+  _topStories = stories.sublist(0, 30);
+  var cachedResults = _topStories.map((id) => _cache[id]).toList();
+  var results =
+      await Future.wait(_topStories.map((id) => _getItem(id, cache: false)));
+  for (var i = 0; i < _topStories.length; i++) {
+    var story = results[i] as Story?;
+    var cached = cachedResults[i] as Story?;
+    if (story == null) {
+      continue;
     }
-    // print(event.data);
-  })
-    ..onError((e) {
-      print(e);
-      exit(1);
-    })
-    ..onDone(() {
-      print('startAPI ended');
-      exit(1);
-    });
+    if (cached == null || cached.descendants != story.descendants) {
+      _refresh(story);
+    }
+  }
 }
 
 void _refresh(Item item) async {
