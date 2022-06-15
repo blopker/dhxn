@@ -23,7 +23,8 @@ class Item {
     required this.kids,
   });
 
-  get timeago => ta.format(DateTime.fromMillisecondsSinceEpoch(time * 1000));
+  String get timeago =>
+      ta.format(DateTime.fromMillisecondsSinceEpoch(time * 1000));
 
   Future<List<Comment>> getKids() async {
     var resultsF = kids.map((kid) => _getItem(kid));
@@ -135,7 +136,7 @@ Future<Item?> _getItem(int id, {cache = true}) async {
   return item;
 }
 
-updateTopStories() async {
+Future<void> updateTopStories() async {
   var url = Uri.parse('https://hacker-news.firebaseio.com/v0/topstories.json');
   List<int>? stories;
   try {

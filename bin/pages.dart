@@ -12,5 +12,5 @@ Future<String> commentPage(int id) async {
   if (story == null) {
     return '404';
   }
-  return await commentTemplate(story);
+  return commentTemplate(story);
 }

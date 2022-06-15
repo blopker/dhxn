@@ -42,7 +42,7 @@ Future<Response> _commentHandler(Request req) async {
 }
 
 void main() async {
-  updateTopStories();
+  unawaited(updateTopStories());
   Timer.periodic(Duration(minutes: 1), (t) {
     updateTopStories();
   });
