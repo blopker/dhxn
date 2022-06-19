@@ -12,18 +12,20 @@ import 'api.dart';
 import 'pages.dart';
 import 'config.dart';
 
+var cssHandler = createFileHandler('assets/main.css',
+    url: '${Env.staticBase}/main.css'.substring(1));
+var favHandler = createFileHandler('assets/favicon.ico',
+    url: '${Env.staticBase}/favicon.ico'.substring(1));
+
 // Configure routes.
 final _router = Router()
   ..get('/', _indexHandler)
   ..get('/comments/<id>', _commentHandler)
+  ..get('${Env.staticBase}/main.css', immutableCache(cssHandler))
   ..get(
-      '${Env.staticBase}/main.css',
-      createFileHandler('assets/main.css',
-          url: '${Env.staticBase}/main.css'.substring(1)))
-  ..get(
-      '${Env.staticBase}/favicon.ico',
-      createFileHandler('assets/favicon.ico',
-          url: '${Env.staticBase}/favicon.ico'.substring(1)));
+    '${Env.staticBase}/favicon.ico',
+    immutableCache(favHandler),
+  );
 
 Response htmlResponse(String content) => Response.ok(content, headers: {
       'content-type': 'text/html; charset=utf-8',
@@ -31,6 +33,17 @@ Response htmlResponse(String content) => Response.ok(content, headers: {
 
 Response _indexHandler(Request req) {
   return htmlResponse(indexPage());
+}
+
+Handler immutableCache(Handler handler) {
+  return (Request request) async {
+    var response = await handler(request);
+    if (Env.isDebug) {
+      return response;
+    }
+    return response.change(
+        headers: {'cache-control': 'public, max-age=31536000, immutable'});
+  };
 }
 
 Future<Response> _commentHandler(Request req) async {

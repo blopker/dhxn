@@ -2,10 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 String _staticBase = () {
-  var random = 'RANDOM';
-  if (Env.isProduction) {
-    random = '${Random().nextInt(1000000)}';
-  }
+  var random = '${Random().nextInt(1000000)}';
   return '/static-$random';
 }();
 
