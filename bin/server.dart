@@ -73,7 +73,7 @@ Future<HttpServer> createServer() async {
       .addMiddleware(gzipMiddleware)
       .addHandler(_router);
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
-  final server = await serve(handler, ip, port);
+  final server = await serve(handler, ip, port, poweredByHeader: null);
   print('Server at http://localhost:${server.port}');
   return server;
 }
