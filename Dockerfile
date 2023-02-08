@@ -8,11 +8,16 @@ RUN dart pub get
 
 # Copy app source code (except anything in .dockerignore) and AOT compile app.
 COPY . .
-RUN dart compile jit-snapshot bin/server.dart
+RUN dart compile exe bin/server.dart -o server
 
-FROM scratch
+# Build minimal serving image from AOT-compiled `/server`
+# and the pre-built AOT-runtime in the `/runtime/` directory of the base image.
+FROM debian:bullseye-slim
+WORKDIR /app
 COPY --from=build /runtime/ /
-COPY --from=build /app/bin/server.jit app/bin/
-COPY --from=build /usr/lib/dart/bin/dart /usr/bin/
+COPY --from=build /app/server /app/
+ADD assets /app/assets
+
+# Start server.
 EXPOSE 8080
-ENTRYPOINT ["dart", "/app/bin/server.jit"]
+CMD ["./server"]
