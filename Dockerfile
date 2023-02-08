@@ -12,7 +12,7 @@ RUN dart compile exe bin/server.dart -o server
 
 # Build minimal serving image from AOT-compiled `/server`
 # and the pre-built AOT-runtime in the `/runtime/` directory of the base image.
-FROM scratch
+FROM debian
 WORKDIR /app
 COPY --from=build /runtime/ /
 COPY --from=build /app/server /app/
