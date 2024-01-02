@@ -3,14 +3,14 @@ import 'dart:io';
 
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
+import 'package:shelf_gzip/shelf_gzip.dart';
+import 'package:shelf_hotreload/shelf_hotreload.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_static/shelf_static.dart';
-import 'package:shelf_hotreload/shelf_hotreload.dart';
-import 'package:shelf_gzip/shelf_gzip.dart';
 
 import 'api.dart';
-import 'pages.dart';
 import 'config.dart';
+import 'pages.dart';
 
 var cssHandler = createFileHandler('assets/main.css',
     url: '${Env.staticBase}/main.css'.substring(1));
@@ -63,6 +63,7 @@ void main() async {
     withHotreload(() => createServer());
   } else {
     await createServer();
+    print('Server ready');
   }
 }
 
@@ -71,7 +72,7 @@ Future<HttpServer> createServer() async {
   final handler = Pipeline()
       .addMiddleware(logRequests())
       .addMiddleware(gzipMiddleware)
-      .addHandler(_router);
+      .addHandler(_router.call);
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
   final server = await serve(handler, ip, port, poweredByHeader: null);
   print('Server at http://localhost:${server.port}');
