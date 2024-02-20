@@ -1,11 +1,16 @@
+import 'dart:convert';
 import 'dart:core';
-import 'package:timeago/timeago.dart' as ta;
+
+import 'package:http/http.dart' as http;
+import 'package:http/retry.dart';
 import 'package:quiver/collection.dart';
-import 'package:dio/dio.dart' as dio;
+import 'package:timeago/timeago.dart' as ta;
 
 var _cache = LruMap<int, Item>(maximumSize: 10000);
-var _client = dio.Dio();
+
 var _topStories = <int>[];
+
+final _client = RetryClient(http.Client());
 
 class Item {
   int id;
@@ -114,13 +119,55 @@ Story _makeStory(Map data) {
   );
 }
 
+Future<http.Response> getUri(String url) async {
+  var uri = Uri.parse(url);
+  try {
+    return await _client.get(uri);
+  } catch (e) {
+    return await _client.get(uri);
+  }
+}
+
+Future<Map?> getJsonMap(String url) async {
+  var response = await getUri(url);
+  if (response.statusCode != 200) {
+    return null;
+  }
+  if (response.body.isEmpty) {
+    return null;
+  }
+  try {
+    final decodedResponse =
+        jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+    return decodedResponse;
+  } catch (e) {
+    return null;
+  }
+}
+
+Future<List<int>?> getJsonList(String url) async {
+  var response = await getUri(url);
+  if (response.statusCode != 200) {
+    return null;
+  }
+  if (response.body.isEmpty) {
+    return null;
+  }
+  try {
+    final decodedResponse =
+        jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+    return decodedResponse.cast<int>();
+  } catch (e) {
+    return null;
+  }
+}
+
 Future<Item?> _getItem(int id, {cache = true}) async {
   if (cache && _cache.containsKey(id)) {
     return _cache[id];
   }
-  var url = Uri.parse('https://hacker-news.firebaseio.com/v0/item/$id.json');
-  var response = await _client.getUri(url);
-  var json = response.data;
+  var json =
+      await getJsonMap('https://hacker-news.firebaseio.com/v0/item/$id.json');
   if (json == null || json['type'] == null) {
     return null;
   }
@@ -137,16 +184,16 @@ Future<Item?> _getItem(int id, {cache = true}) async {
 }
 
 Future<void> updateTopStories() async {
-  var url = Uri.parse('https://hacker-news.firebaseio.com/v0/topstories.json');
-  List<int>? stories;
+  List<int> stories;
   try {
-    var response = await _client.getUri(url);
-    stories = response.data.cast<int>();
+    final response = await getJsonList(
+        'https://hacker-news.firebaseio.com/v0/topstories.json');
+    if (response == null) {
+      return;
+    }
+    stories = response;
   } catch (e) {
     print(e);
-    return;
-  }
-  if (stories == null) {
     return;
   }
   _topStories = stories.sublist(0, 30);
