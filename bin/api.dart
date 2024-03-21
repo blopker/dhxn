@@ -86,6 +86,13 @@ Comment _makeComment(Map data) {
   );
 }
 
+String cleanTag(String html) {
+  return html
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;');
+}
+
 Story _makeStory(Map data) {
   var kids = data['kids']?.cast<int>() ?? <int>[];
   var displayHNUrl = 'https://news.ycombinator.com/item?id=${data['id']}';
@@ -111,7 +118,7 @@ Story _makeStory(Map data) {
     kids: kids,
     score: data['score'],
     url: url,
-    title: data['title'],
+    title: cleanTag(data['title']),
     descendants: data['descendants'],
     displayUrl: displayUrl,
     displayUrlLong: displayUrlLong,
