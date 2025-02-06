@@ -14,7 +14,7 @@ Future<String> _commentHTML(Comment comment) async {
   if (comment.by.isEmpty || comment.text.isEmpty) {
     return '';
   }
-  return '''        
+  return '''
   <details open class="comment">
       <summary class="author">${comment.by} - ${comment.timeago}</summary>
       <div class="text">${comment.text}</div>
@@ -40,9 +40,9 @@ String _storyHTML(Story story, String commentsHTML) {
     <div>
         <div class="comment-header">
             <h3>${story.title}</h3>
-            <a href=${story.url}>${story.displayUrlLong}</a>
+            <a href=${story.url} rel="noreferrer">${story.displayUrlLong}</a>
             <div class="comment-header-author">By: ${story.by}</div>
-            <a href=${story.displayHNUrl}>HN Link</a>
+            <a href=${story.displayHNUrl} rel="noreferrer">HN Link</a>
             <div class="text">${story.text}</div>
         </div>
         <div class="comments">

@@ -9,7 +9,7 @@ String indexTemplate(Iterable<Story> stories) {
 String _storyHTML(Story story) {
   var content = '''
     <div class="list-item">
-        <a href="${story.url}">
+        <a href="${story.url}" rel="noreferrer">
             <div class="story">
                 <h3>${story.title}</h3>
                 <div class="host">${story.displayUrl}</div>
