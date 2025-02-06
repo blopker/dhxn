@@ -14,10 +14,11 @@ RUN dart compile exe bin/server.dart -o bin/server
 # Build minimal serving image from AOT-compiled `/server` and required system
 # libraries and configuration files stored in `/runtime/` from the build stage.
 FROM scratch
+WORKDIR /app
 COPY --from=build /runtime/ /
 COPY --from=build /app/bin/server /app/bin/
 COPY --from=build /app/assets /app/assets
 
 # Start server.
 EXPOSE 8080
-CMD ["/app/bin/server"]
+CMD ["bin/server"]
