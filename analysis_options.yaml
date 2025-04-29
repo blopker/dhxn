@@ -21,9 +21,7 @@ linter:
     - prefer_single_quotes
     - sort_child_properties_last
     - unawaited_futures
-    - unsafe_html
     - use_full_hex_values_for_flutter_colors
-
 # analyzer:
 #   exclude:
 #     - path/to/excluded/files/**
